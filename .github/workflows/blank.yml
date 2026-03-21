@@ -15,6 +15,7 @@ jobs:
       YC_SERVICE_ACCOUNT_KEY_FILE: ${{ github.workspace }}/.key.json
       AWS_ACCESS_KEY_ID: ${{ secrets.YC_S3_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_S3_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ru-central1
 
     steps:
       - uses: actions/checkout@v4
@@ -30,14 +31,14 @@ jobs:
         env:
           BACKEND: ${{ secrets.BACKEND }}
         run: |
-          echo "$BACKEND" > backend-config.tf
+          echo "$BACKEND" > backend-config.hcl
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.9.0"
+          terraform_version: "1.14.7"
 
       - name: Terraform
         run: |
-          terraform init -input=false
+          terraform init -input=false -backend-config=backend-config.hcl
           terraform validate
           terraform plan -input=false -no-color

@@ -1,0 +1,38 @@
+name: Terraform CI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+      YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+      YC_SERVICE_ACCOUNT_KEY_FILE: ${{ github.workspace }}/.key.json
+      AWS_ACCESS_KEY_ID: ${{ secrets.YC_S3_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_S3_SECRET_ACCESS_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write Yandex SA key to file
+        env:
+          SA_JSON: ${{ secrets.YC_SA_JSON }}
+        run: |
+          echo "$SA_JSON" > .key.json
+          chmod 600 .key.json
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
+      - name: Terraform
+        working-directory: Day-5   # свой путь
+        run: |
+          terraform init -input=false
+          terraform validate
+          terraform plan -input=false -no-color

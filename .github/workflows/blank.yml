@@ -26,6 +26,10 @@ jobs:
           echo "$SA_JSON" > .key.json
           chmod 600 .key.json
 
+      - name: Write terraformrc file
+        run: |
+          cat te terraformrc > ~/.terraformrc 
+
       - name: Write backend config from secret
         env:
           BACKEND: ${{ secrets.BACKEND }}

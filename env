@@ -1,0 +1,6 @@
+export YC_TOKEN=$(yc iam create-token --impersonate-service-account-id ajeqccf9t2d4umd9dnij)
+export YC_CLOUD_ID=$(yc config get cloud-id)
+export YC_FOLDER_ID=$(yc config get folder-id)
+export YC_KEY
+export AWS_ACCESS_KEY_ID="mock_access_key"
+export AWS_SECRET_ACCESS_KEY="mock_secret_key" 

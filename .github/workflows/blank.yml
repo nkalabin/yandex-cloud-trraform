@@ -21,7 +21,7 @@ jobs:
 
       - name: Write Yandex SA key to file
         env:
-          SA_JSON: ${{ secrets.KEY_JSON }}
+          KEY_JSON: ${{ secrets.KEY_JSON }}
         run: |
           echo "$KEY_JSON" > .key.json
           chmod 600 .key.json

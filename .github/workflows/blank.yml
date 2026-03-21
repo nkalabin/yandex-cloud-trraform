@@ -28,7 +28,7 @@ jobs:
 
       - name: Write terraformrc file
         run: |
-          cat te terraformrc > ~/.terraformrc 
+          cat ./terraformrc > ~/.terraformrc 
 
       - name: Write backend config from secret
         env:

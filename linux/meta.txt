@@ -1,0 +1,16 @@
+#cloud-config
+users:
+  - name: user
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINehaM9ohmY6nK0bV1JJgFhGbdDykrpYa3XU1FmlaFvY server connect
+
+chpasswd:
+  list: |
+    root:P@ssw0rd
+    user:Init1234
+  expire: False
+
+ssh_pwauth: true

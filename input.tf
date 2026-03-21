@@ -8,5 +8,6 @@ variable "vm_map" {
     public_ip    = optional(bool, true)
     core_fraction = optional(number, 20)
   }))
+  default = {}
 }
 

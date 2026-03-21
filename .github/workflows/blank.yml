@@ -21,9 +21,9 @@ jobs:
 
       - name: Write Yandex SA key to file
         env:
-          SA_JSON: ${{ secrets.YC_SA_JSON }}
+          SA_JSON: ${{ secrets.KEY_JSON }}
         run: |
-          echo "$SA_JSON" > .key.json
+          echo "$KEY_JSON" > .key.json
           chmod 600 .key.json
 
       - name: Write terraformrc file

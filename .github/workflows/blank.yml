@@ -58,7 +58,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: plan.txt
-          path: ${{ github.workspace }}/.plan.txt
+          path: ${{ github.workspace }}/plan.txt
           if-no-files-found: error
           retention-days: 7
           compression-level: 0

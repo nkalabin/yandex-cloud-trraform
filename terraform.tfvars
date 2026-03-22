@@ -1,10 +1,11 @@
 vm_map = {
   prod_1 = {
-    distro    = "ubuntu_24"
+    distro    = "ubuntu_22"
     cores     = 2
     memory    = 4
     public_ip = true
     subnet_name = "test_subnet"
+    deploy_app = true
   }
   prod_2 = {
     distro = "ubuntu_22"
@@ -12,6 +13,7 @@ vm_map = {
     memory = 2
     public_ip = true
     subnet_name = "obeme"
+    deploy_app = true
   }
 }
 

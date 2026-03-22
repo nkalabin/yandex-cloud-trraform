@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Write Yandex SA key to file
+      - name: Write Yandex key to file
         env:
           KEY_JSON: ${{ secrets.KEY_JSON }}
         run: |
@@ -53,7 +53,18 @@ jobs:
 
       - name: Terraform plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -input=false -no-color
+        run: terraform plan -no-color | tee plan.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plan.json
+          path: ${{ github.workspace }}/.plan.txt
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: false
+          include-hidden-files: false
+        if: github.event_name == 'pull_request'
 
       - name: Terraform apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

@@ -35,11 +35,11 @@ module "yandex_vpc_subnet" {
   cidr = each.value.cidr
 }
 
-module "yandex_vpc_default_security_group" {
-  source = "./modules/yandex_vpc_default_security_group"
-  for_each = var.network_names
-  network_id = module.yandex_vpc_network["${each.key}"].network_id
-}
+# module "yandex_vpc_default_security_group" {
+#   source = "./modules/yandex_vpc_default_security_group"
+#   for_each = var.network_names
+#   network_id = module.yandex_vpc_network["${each.key}"].network_id
+# }
 
 module "yandex_vpc_security_group" {
   source = "./modules/yandex_vpc_security_group"
@@ -62,6 +62,35 @@ module "yandex_instance" {
   subnet_id = module.yandex_vpc_subnet["${each.value.subnet_name}"].subnet_id
 }
 
+resource "terraform_data" "upload_app" {
+  for_each = {
+    for k, v in var.vm_map : k => v if v.deploy_app
+  }
+  depends_on = [module.yandex_instance]  # или module...
+
+  connection {
+    type     = "ssh"
+    host     = module.yandex_instance[each.key].internal_ip_address_vm_1
+    user     = "user"
+    password = "Init1234"
+  }
+
+  provisioner "file" {
+    source      = "${path.root}/app.py"
+    destination = "/home/user/app.py"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt update -y",
+      "sudo apt-get install -y python3-pip",
+      "cd /home/user",
+      "pip3 install flask",
+      "nohup python3 /home/user/app.py > /home/user/app.log 2>/dev/null &",
+      "sleep 5"
+    ]
+  }
+}
 
 output "public_ip" {
   value = {

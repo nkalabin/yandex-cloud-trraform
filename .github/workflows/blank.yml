@@ -53,7 +53,7 @@ jobs:
 
       - name: Terraform plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color | tee plan.txt
+        run: terraform plan -out=planfile -no-color | tee plan.txt
 
       - uses: actions/upload-artifact@v4
         with:
@@ -68,4 +68,4 @@ jobs:
 
       - name: Terraform apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -input=false -auto-approve -no-color
+        run: terraform apply "planfile" -no-color

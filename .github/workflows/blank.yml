@@ -24,7 +24,7 @@ jobs:
       AWS_DEFAULT_REGION: ru-central1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Write Yandex key to file
         env:
@@ -55,7 +55,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: terraform plan -out=planfile -no-color | tee plan.txt
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: plan.txt
           path: ${{ github.workspace }}/plan.txt

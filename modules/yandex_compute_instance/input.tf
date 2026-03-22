@@ -27,10 +27,6 @@ variable "public_ip" {
   default = "true"
 }
 
-variable "security_group_ids" {
-  type=set(string)
-}
-
 variable "disk_type" {
     type = string
     default = "network-hdd"

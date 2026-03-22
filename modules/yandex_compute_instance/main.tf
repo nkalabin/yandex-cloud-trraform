@@ -22,7 +22,6 @@ resource "yandex_compute_instance" "vm-1" {
   network_interface {
     subnet_id = var.subnet_id
     nat       = var.public_ip
-    security_group_ids = var.security_group_ids
   }
 
   metadata = {

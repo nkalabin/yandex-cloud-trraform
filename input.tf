@@ -8,6 +8,7 @@ variable "vm_map" {
     public_ip    = optional(bool, true)
     subnet_name  = optional(string, "")
     core_fraction = optional(number, 20)
+    deploy_app = optional(bool, false)
   }))
   default = {}
 }

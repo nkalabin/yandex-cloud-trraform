@@ -24,9 +24,9 @@ jobs:
       AWS_DEFAULT_REGION: ru-central1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Write Yandex SA key to file
+      - name: Write Yandex key to file
         env:
           KEY_JSON: ${{ secrets.KEY_JSON }}
         run: |
@@ -41,7 +41,7 @@ jobs:
           BACKEND: ${{ secrets.BACKEND }}
         run: echo "$BACKEND" > backend-config.hcl
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.14.7"
 
@@ -53,8 +53,19 @@ jobs:
 
       - name: Terraform plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -input=false -no-color
+        run: terraform plan -out=planfile -no-color | tee plan.txt
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: plan.txt
+          path: ${{ github.workspace }}/plan.txt
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: false
+          include-hidden-files: false
+        if: github.event_name == 'pull_request'
 
       - name: Terraform apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -input=false -auto-approve -no-color
+        run: terraform apply "planfile" -no-color

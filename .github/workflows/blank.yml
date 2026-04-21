@@ -1,0 +1,70 @@
+name: Terraform CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write   
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+      YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+      YC_SERVICE_ACCOUNT_KEY_FILE: ${{ github.workspace }}/.key.json
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ru-central1
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Write Yandex key to file
+        env:
+          KEY_JSON: ${{ secrets.KEY_JSON }}
+        run: |
+          echo "$KEY_JSON" > .key.json
+          chmod 600 .key.json
+
+      - name: Write terraformrc file
+        run: cat ./terraformrc > ~/.terraformrc
+
+      - name: Write backend config from secret
+        env:
+          BACKEND: ${{ secrets.BACKEND }}
+        run: echo "$BACKEND" > backend-config.hcl
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.14.7"
+
+      - name: Terraform init
+        run: terraform init -input=false -backend-config=backend-config.hcl
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        if: github.event_name == 'pull_request' || github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform plan -no-color | tee plan.txt
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: plan.txt
+          path: ${{ github.workspace }}/plan.txt
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: false
+          include-hidden-files: false
+        if: github.event_name == 'pull_request' || github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+      - name: Terraform apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -no-color -auto-approve
